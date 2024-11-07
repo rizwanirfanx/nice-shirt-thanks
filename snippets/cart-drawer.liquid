@@ -161,7 +161,6 @@
                             </div>
                           {%- endif -%}
 
-                          {{ item.variant.price }}
                           {% render 'product-entries', template: 'cart', product: item.product, current_variant: item.variant %}
 
                           {%- if item.product.has_only_default_variant == false

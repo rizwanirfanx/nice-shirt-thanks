@@ -3522,3 +3522,11 @@ details-disclosure > details {
   z-index: -1;
 }
 
+
+.flex{
+  display: flex;
+}
+
+align-center{
+  align-items: center;
+}

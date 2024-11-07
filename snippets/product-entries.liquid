@@ -136,7 +136,7 @@ endif
     <span class="product_entries_count">
       {% if bonus_entries > 0 %}
         {% assign bonus_entries = bonus_entries %}
-        <span class="entries_count" data-multiplier="{{ multiplier }}" >{{ entries | plus: bonus_entries}} Entries </span>
+        <span class="entries_count" data-multiplier="{{ multiplier }}" >Earn {{ entries | plus: bonus_entries}} Entries </span>
       {% else %}
          <span class="entries_count" data-multiplier="{{ multiplier }}" >{{ entries }} Entries </span>
       {% endif %}
@@ -171,6 +171,12 @@ endif
 
 
 <style>
+  .flex{
+    display:flex;
+  }
+  .justify-center{
+    justify-content:center;
+  }
 
   .product__price-container {
     width:20%;
@@ -191,7 +197,7 @@ endif
     display:flex;
   }
   .product_entries_block {
-    justify-content:center;
+    {% comment %} justify-content:center; {% endcomment %}
     align-items:center;
     align-content:flex-start;
     display:flex;
@@ -200,8 +206,6 @@ endif
  .vs_product_entries {
     font-size: calc(var(--typeBaseSize) + 4px);
     border-left: 1px solid #ccc;
-    padding-left: 20px;
-    margin-left: 14px;
   }
   span.bonusentries_promo {
   }
