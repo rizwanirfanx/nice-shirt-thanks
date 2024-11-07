@@ -1273,3 +1273,11 @@ class ProductRecommendations extends HTMLElement {
 }
 
 customElements.define('product-recommendations', ProductRecommendations);
+
+document.addEventListener('DOMContentLoaded', () => {
+  // listen for Cart Item Quantity updates using the Custom Event Listener
+  document.addEventListener('cart-item-qty-change', (event) => {
+    console.log('Cart Item Quantity Changed')
+  });
+
+})
