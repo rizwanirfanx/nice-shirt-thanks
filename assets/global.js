@@ -157,7 +157,11 @@ class QuantityInput extends HTMLElement {
     super();
     this.input = this.querySelector('input');
     this.changeEvent = new Event('change', { bubbles: true });
-    this.cartItemQtyChangeEvent = new CustomEvent('cart-item-qty-change', { bubbles: true });
+    this.cartItemQtyChangeEvent = new CustomEvent('cart-item-qty-change', {
+      bubbles: true, detail: {
+        qty: this.input.value,
+      }
+    });
     this.input.addEventListener('change', this.onInputChange.bind(this));
     this.querySelectorAll('button').forEach((button) =>
       button.addEventListener('click', this.onButtonClick.bind(this))
@@ -1278,6 +1282,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // listen for Cart Item Quantity updates using the Custom Event Listener
   document.addEventListener('cart-item-qty-change', (event) => {
     console.log('Cart Item Quantity Changed')
+    console.log(event.detail.qty)
   });
 
 })
