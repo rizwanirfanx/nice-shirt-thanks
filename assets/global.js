@@ -182,6 +182,9 @@ class QuantityInput extends HTMLElement {
   }
 
   onInputChange(event) {
+    // get the input value
+    const value = parseInt(this.input.value); 
+    console.log('On Input Change ', value);
     this.validateQtyRules();
   }
 
