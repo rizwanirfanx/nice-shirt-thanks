@@ -157,6 +157,7 @@ class QuantityInput extends HTMLElement {
     super();
     this.input = this.querySelector('input');
     this.changeEvent = new Event('change', { bubbles: true });
+    this.cartItemQtyChangeEvent = new CustomEvent('cart-item-qty-change', { bubbles: true });
     this.input.addEventListener('change', this.onInputChange.bind(this));
     this.querySelectorAll('button').forEach((button) =>
       button.addEventListener('click', this.onButtonClick.bind(this))
@@ -185,7 +186,10 @@ class QuantityInput extends HTMLElement {
     const previousValue = this.input.value;
 
     event.target.name === 'plus' ? this.input.stepUp() : this.input.stepDown();
-    if (previousValue !== this.input.value) this.input.dispatchEvent(this.changeEvent);
+    if (previousValue !== this.input.value) {
+      this.input.dispatchEvent(this.changeEvent);
+      this.input.dispatchEvent(this.cartItemQtyChangeEvent);
+    }
   }
 
   validateQtyRules() {
