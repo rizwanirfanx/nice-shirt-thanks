@@ -1,0 +1,53 @@
+<div class="page-width">
+  <div class="grid">
+    <div class="grid__item medium-up--five-sixths medium-up--push-one-twelfth">
+      <div class="section-header text-center">
+        <h1>{{ page.title }}</h1>
+      </div>
+
+      {% if page.content.size > 0 %}
+        <div class="rte">
+          {{ page.content }}
+        </div>
+      {% endif %}
+      
+      <div class="application-form form-vertical">
+        {%- assign formId = 'ApplicationForm' -%}
+        {% form 'contact', id: formId %}
+        {% include 'form-status', form: form, form_id: formId %}
+
+
+        <div class="grid grid--half-gutters">
+          <div class="grid__item medium-up--one-half">
+            <label for="{{ formId }}-first-name">{{ 'applicant.form.firstname' | t }} <span aria-hidden="true">*</span></label>
+            <input type="text" id="{{ formId }}-first-name" name="contact[{{ 'applicant.form.firstname' | t }}]" value="{% if form[firstname] %}{{ form[firstname] }}{% elsif customer %}{{ customer.firstname }}{% endif %}" aria-required="true" required>
+          </div>
+          <div class="grid__item medium-up--one-half">
+            <label for="{{ formId }}-last-name">{{ 'contact.form.lastname' | t }} <span aria-hidden="true">*</span></label>
+            <input type="text" id="{{ formId }}-last-name"  name="contact[{{ 'applicant.form.lastname' | t }}]"  value="{% if form[lastname] %}{{ form[lastname] }}{% elsif customer %}{{ customer.lastname }}{% endif %}" aria-required="true" required >
+          </div>
+        </div>
+        
+        <label for="{{ formId }}-email">{{ 'applicant.form.email' | t }} <span aria-hidden="true">*</span></label>
+        <input type="email" id="{{ formId }}-email" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" aria-required="true" required>
+                
+        <label for="{{ formId }}-portfolio">{{ 'applicant.form.portfolio' | t }}</label>
+        <input id="{{ formId }}-portfolio" name="applicant[{{ 'applicant.form.portfolio' | t }}]" value="{% if form[portfolio] %}{{ form[portfolio] }}{% elsif customer %}{{ customer.portfolio }}{% endif %}">
+        
+        {% comment %}
+        Upload-Lift widget element container
+        {% endcomment %}
+        <label for="apply-image">Image</label>
+        <div class="apply-here-image-up" id = 'apply-image'></div>
+        
+        
+        <label for="apply-doc">Resume (Optional)</label>
+        <div class="apply-here-doc-up" id = 'apply-doc'></div>
+
+        <input type="submit" class="btn" value="{{ 'applicant.form.submit' | t }}">
+      		
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</div>

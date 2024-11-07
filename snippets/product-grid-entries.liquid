@@ -1,0 +1,332 @@
+{% assign giveaway_status =  settings.giveaway_status %}
+
+{% if giveaway_status == 'Enabled' %} 
+
+  
+{% assign is_special_multiplier = false %}
+
+  
+{%- liquid
+   assign tag_class_name = ''
+assign FinalEntriesm = settings.giveaway_multiplier
+  assign FinalTotalPrice = cart.total_price
+ assign discounted_price = 0
+   assign discounted_price_per = 0
+   assign free_ship_qualify = false 
+      if customer.has_account
+      assign customerTag = customer.tags
+        for logintag in customerTag
+          if logintag == 'customer-level-1' 
+            assign FinalEntriesm = 30
+            assign discounted_price_per = 5
+            assign discounted_price = FinalTotalPrice | times: 0.95
+            assign FinalTotalPrice = discounted_price 
+            assign free_ship_qualify = true
+            assign tag_class_name = "customer-level-entries customer-level-entries-silver"
+          elsif logintag == 'customer-level-2' 
+            assign FinalEntriesm = 50
+             assign discounted_price_per = 10
+            assign discounted_price = FinalTotalPrice | times: 0.90
+            assign FinalTotalPrice = discounted_price 
+            assign free_ship_qualify = true
+            assign tag_class_name = "customer-level-entries customer-level-entries-gold"
+          elsif logintag == 'customer-level-3'
+            assign FinalEntriesm = 100
+             assign discounted_price_per = 15
+            assign discounted_price = FinalTotalPrice | times: 0.85
+            assign FinalTotalPrice = discounted_price
+            assign free_ship_qualify = true
+            assign tag_class_name = "customer-level-entries customer-level-entries-platinum"
+          endif 
+        endfor  
+      endif
+
+    assign totalPrice2 = FinalTotalPrice | minus: savedby.final_price  | round 
+%}
+  {% comment %} assign entries = product.price | divided_by: 100 | times: settings.giveaway_multiplier {% endcomment %}
+    {%- liquid
+
+        assign entries = product.price | divided_by: 100 | times: FinalEntriesm
+
+
+      assign bonusCount =  0
+      if product.tags contains 'bonusentries'
+        assign bonusCount = bonusCount | plus: settings.giveaway_bonus
+        assign entries = entries | plus: settings.giveaway_bonus
+      endif
+
+      if product.collections contains 'bundles'
+        assign bonusCount = bonusCount | plus: settings.giveaway_bundlebonus
+        assign entries = entries | plus: settings.giveaway_bundlebonus
+      endif
+
+      if product.tags contains 'bonus_1k'
+        assign bonusCount = bonusCount | plus: settings.giveaway_bundlebonus
+        assign entries = entries | plus: settings.giveaway_bundlebonus
+      endif
+
+      if product.tags contains '_label_Last_Chance'
+        assign bonusCount = bonusCount | plus: settings.lastchance_bonus
+          assign lastchance_entries = settings.lastchance_bonus
+        assign entries = entries | plus: settings.lastchance_bonus
+      endif
+
+      if product.tags contains 'holiday_bonus'
+        assign bonusCount = bonusCount | plus: settings.holiday_bonus
+          assign holidaybonus_entries = settings.holiday_bonus
+          assign entries = entries | plus: settings.holiday_bonus
+      endif
+
+      if product.tags contains 'custom_bonus'
+        assign bonusCount = bonusCount | plus: settings.custom_bonus
+          assign custombonus_entries = settings.custom_bonus
+          assign entries = entries | plus: settings.custom_bonus
+      endif
+
+      if product.tags contains 'special_bonus'
+        assign bonusCount = bonusCount | plus: settings.special_bonus
+          assign custombonus_entries = settings.special_bonus
+          assign entries = entries | plus: settings.special_bonus
+      endif
+
+
+      if product.tags contains 'new_bonus'
+        assign bonusCount = bonusCount | plus: settings.new_bonus
+          assign custombonus_entries = settings.new_bonus
+          assign entries = entries | plus: settings.new_bonus
+      endif
+
+      if product.tags contains 'more_bonus'
+      assign bonusCount = bonusCount | plus: settings.more_bonus
+        assign custombonus_entries = settings.more_bonus
+        assign entries = entries | plus: settings.more_bonus
+    endif
+
+
+      assign multiplier = settings.giveaway_multiplier
+      assign multiplier = FinalEntriesm
+       
+      if product.tags contains 'specialentries'
+        assign entries = product.price | divided_by: 100 | times: settings.special_multiplier
+        assign multiplier = settings.special_multiplier
+        assign bonusCount = 0
+        assign is_special_multiplier = true
+      endif
+
+      assign is_landing_page = false
+      assign page_handles = settings.landing_page_handles | split: ", "
+      assign current_url = request.path
+      assign current_page_handle = page.handle
+    
+      for page_handle in page_handles
+        if current_page_handle contains page_handle
+          assign is_landing_page = true
+        endif
+      endfor
+
+
+    -%}
+
+
+
+
+    {% unless is_landing_page %}
+      
+      {% if product.metafields.custom.custom_multiplier.value != blank %}
+      <!-- Custom Layout -->
+
+      <div class="vs_grid_entries {{ tag_class_name  }}">
+        <div class="entries-count">
+       {% comment %}  <i class="fa-solid fa-ticket"></i> {% endcomment %}
+          <span class="grid_entries_count" data-bonuscount="{{bonusCount}}">{{ product.metafields.custom.custom_multiplier.value }}</span>
+          
+        </div>
+        <div class="multiplier-value blink-soft new-3">
+          {{ product.metafields.custom.custom_multiplier_value.value }}X
+        </div>
+      </div>
+      {% else %}
+
+
+      <!--- Default -->
+      <div class="vs_grid_entries entries-default {{ tag_class_name }}">
+        <div class="entries-count">
+         {% comment %}  <i class="fa-solid fa-ticket"></i> {% endcomment %}
+          <span class="grid_entries_count" data-bonuscount="{{bonusCount}}">Earn {{ entries }} </span>
+          <span class="grid_label">Entries</span>
+        </div>
+        {% if is_special_multiplier == true %}
+          <div class="multiplier-value grid-entries new-2 orange">
+            <span class="blink-soft">{{ multiplier }}X</span>
+          </div>
+      
+          {%else%}
+      
+          <div class="multiplier-value new-2">
+            <span class="blink-soft">{{ multiplier }}X</span>
+          </div>
+      
+      {%endif%}
+
+
+      </div>
+
+      {% endif %}
+
+
+      <style>
+        .grid-product__price {
+          opacity: 0.6;
+          font-style: italic;
+        }
+        .grid-product__link {
+          position: relative;
+        }
+        .vs_grid_entries {
+              display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          margin-top: 10px;
+          z-index: 1;
+          position: relative;
+          background: rgb(238 238 238 / 80%);
+          width: 95%;
+          /*box-shadow: rgb(149 157 165 / 30%) 0px 6px 12px 3px;
+          border-radius: 5px;*/
+          margin:0 auto;
+        }
+
+        .customer-level-entries-silver{
+          border : 3px solid #C0C0C0;
+        }
+        .vs_grid_entries.customer-level-entries-silver,
+        .vs_grid_entries.customer-level-entries-silver  .multiplier-value {
+          background: #C0C0C0;
+        }
+
+
+        .customer-level-entries-gold{
+          border : 3px solid #FFD700;
+        }
+        .vs_grid_entries.customer-level-entries-gold,
+        .vs_grid_entries.customer-level-entries-gold .multiplier-value {
+          background: #FFD700;
+        }
+        .vs_grid_entries.customer-level-entries-gold .entries-count {
+          background: #FFD700;
+          color:black;
+        }
+
+
+        .customer-level-entries-platinum{
+          border : 3px solid #E5E4E2;
+        }
+        .vs_grid_entries.customer-level-entries-platinum,
+        .vs_grid_entries.customer-level-entries-platinum .multiplier-value {
+          background: #E5E4E2;
+        }
+
+
+
+        .vs_grid_entries .fa-ticket {
+              color: #119211;
+          font-size: 20px;
+        }
+        .grid_entries_count {
+          margin: 0 5px 0 10px;
+        /*animation: accent 3s linear infinite;*/
+      }
+
+      /*@keyframes accent {
+        0%, 100% {
+          font-size: 1.3em;
+        } 10%, 90% {
+          font-size: 1em;
+        }
+      }*/
+
+        .grid-product:nth-of-type(2n) .grid_entries_count { animation-delay: 0.2s }
+        .grid-product:nth-of-type(3n) .grid_entries_count { animation-delay: 0.3s }
+        .grid-product:nth-of-type(4n) .grid_entries_count { animation-delay: 0.4s }
+        .grid-product:nth-of-type(5n) .grid_entries_count { animation-delay: 0.5s }
+
+
+      @media(max-width:640px) {
+        .vs_grid_entries { 
+          width:100%;
+        }
+      }
+        
+        @media(max-width:480px) {
+          .grid_entries_count {
+            margin:0px;
+          }
+          .vs_grid_entries .entries-count {
+            justify-content: space-around;
+          }
+        }
+
+
+.vs_grid_entries .fa-ticket {
+    color: #119211;
+    font-size: 20px;
+}
+ 
+.fa-solid, .fas {
+    font-weight: 900;
+} 
+.fa-classic, .fa-regular, .fa-solid, .far, .fas {
+    font-family: "Font Awesome 6 Free";
+}
+  
+.grid-product:nth-of-type(3n) .grid_entries_count {
+    animation-delay: 0.3s;
+}
+.featured-atc.atc-custom .grid__item .vs_grid_entries .entries-count, 
+.featured-atc .grid__item .vs_grid_entries .entries-count, 
+.vs_grid_entries .entries-count {
+    width: 75%;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    font-family: "Oswald", sans-serif;
+    text-transform: uppercase;
+    gap:7px;
+}  
+
+  .featured-atc.atc-custom .grid__item .vs_grid_entries .multiplier-value, .featured-atc .grid__item .vs_grid_entries .multiplier-value, .vs_grid_entries .multiplier-value {
+    font-weight: bold;
+    font-family: "Montserrat", sans-serif;
+    text-transform: uppercase;
+    width: 25%;
+    text-align: center;
+    background: #1dfe00;
+
+    animation: blinker 1s linear infinite;
+
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+    animation-name: blinker;
+ 
+  animation: blinker 1s linear infinite;
+ 
+
+
+}
+  @keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+      </style>
+    {% endunless %}
+{% endif %}

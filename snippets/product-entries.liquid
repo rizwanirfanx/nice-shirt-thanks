@@ -1,0 +1,280 @@
+{% assign giveaway_status =  settings.giveaway_status %}
+{% assign qunatity = cart_item.quantity %}
+
+{% if giveaway_status == "Enabled" %} 
+
+
+{%- liquid
+assign FinalEntriesm = settings.giveaway_multiplier
+   
+  assign FinalTotalPrice = cart.total_price
+ assign discounted_price = 0
+   assign discounted_price_per = 0
+   assign free_ship_qualify = false 
+      if customer.has_account
+      assign customerTag = customer.tags
+        for logintag in customerTag
+          if logintag == 'customer-level-1' 
+            assign FinalEntriesm = 30
+            assign discounted_price_per = 5
+            assign discounted_price = FinalTotalPrice | times: 0.95
+            assign FinalTotalPrice = discounted_price 
+            assign free_ship_qualify = true
+          elsif logintag == 'customer-level-2' 
+            assign FinalEntriesm = 50
+             assign discounted_price_per = 10
+            assign discounted_price = FinalTotalPrice | times: 0.90
+            assign FinalTotalPrice = discounted_price 
+            assign free_ship_qualify = true
+          elsif logintag == 'customer-level-3'
+            assign FinalEntriesm = 100
+             assign discounted_price_per = 15
+            assign discounted_price = FinalTotalPrice | times: 0.85
+            assign FinalTotalPrice = discounted_price
+            assign free_ship_qualify = true
+          endif 
+        endfor  
+      endif
+
+    assign totalPrice2 = FinalTotalPrice | minus: savedby.final_price  | round 
+%}
+ 
+{%- liquid
+	
+    if template == "cart"
+      assign entries = current_variant.price | divided_by: 100 | times: qunatity | times: FinalEntriesm
+      
+    else
+      assign entries = product.price | divided_by: 100 | times: FinalEntriesm
+   endif
+
+
+   if product.tags contains 'bonusentries'
+     assign bonus_entries = settings.giveaway_bonus
+     assign total_entries = entries | plus: settings.giveaway_bonus
+   endif
+
+   if product.tags contains 'bundles'
+      assign bonus_entries = settings.giveaway_bundlebonus
+      assign total_entries = entries | plus: settings.giveaway_bundlebonus
+   endif
+
+   if product.tags contains 'bonus_1k'
+   assign bonus_entries = settings.giveaway_bundlebonus
+   assign total_entries = entries | plus: settings.giveaway_bundlebonus
+endif
+
+   if product.tags contains '_label_Last_Chance'
+      assign bonus_entries = settings.lastchance_bonus
+     assign total_entries = entries | plus: settings.lastchance_bonus
+   endif
+
+   if product.tags contains 'holiday_bonus'
+      assign bonus_entries = settings.holiday_bonus
+      assign total_entries = entries | plus: settings.holiday_bonus
+   endif
+
+   if product.tags contains 'custom_bonus'
+    assign bonus_entries = settings.custom_bonus
+    assign total_entries = entries | plus: settings.custom_bonus
+  endif
+
+  if product.tags contains 'special_bonus'
+  assign bonus_entries = settings.special_bonus
+  assign total_entries = entries | plus: settings.special_bonus
+endif
+
+if product.tags contains 'new_bonus'
+assign bonus_entries = settings.new_bonus
+assign total_entries = entries | plus: settings.new_bonus
+endif
+
+if product.tags contains 'more_bonus'
+assign bonus_entries = settings.more_bonus
+assign total_entries = entries | plus: settings.more_bonus
+endif
+
+
+   assign multiplier = settings.giveaway_multiplier
+
+   if product.tags contains 'specialentries'
+     assign entries = product.price | divided_by: 100 | times: settings.special_multiplier | times: qunatity
+     assign multiplier = settings.special_multiplier
+
+   endif
+
+   assign is_multiplier = null
+   if product.title contains 'Multiplier'
+    assign is_multiplier = true
+   endif
+
+-%}
+
+
+
+
+<div class="product_entries_block">
+  {%if is_multiplier%}
+  
+
+    {% if discounted_price_per > 0 %}<span class="product_entries_discount">{{ discounted_price_per }}% OFF</span> {% endif %}
+  <span class="vs_product_entries">
+  {% comment %}  <i class="fa-solid fa-ticket"></i> {% endcomment %}
+      <span class="product_entries_count">
+        <span class="entries_count" data-multiplier="{{ multiplier }}" >
+          {{ product.metafields.custom.custom_multiplier_value.value }}X
+        </span>
+      </span>
+  </span>
+
+  {%else%}
+
+    {% if discounted_price_per > 0 %}<span class="product_entries_discount">{{ discounted_price_per }}% OFF</span> {% endif %}
+  <span class="vs_product_entries product_entries_part">
+   <div class="icon_content_area"> 
+ {% comment %}  <i class="fa-solid fa-ticket"></i> {% endcomment %}
+    <span class="product_entries_count">
+      {% if bonus_entries > 0 %}
+        {% assign bonus_entries = bonus_entries %}
+        <span class="entries_count" data-multiplier="{{ multiplier }}" >{{ entries | plus: bonus_entries}} Entries </span>
+      {% else %}
+         <span class="entries_count" data-multiplier="{{ multiplier }}" >{{ entries }} Entries </span>
+      {% endif %}
+      
+      {% comment %}
+      <span class="entries_count" data-multiplier="{{ multiplier }}" >{{ entries }}</span>
+      {% if bonus_entries > 0 %} + {{ bonus_entries }} 
+       <span class="product_entries_label"> Bonus Entries</span>
+      {% else %}
+       <span class="product_entries_label">Entries</span>
+      {% endif %}
+      {% endcomment %}
+   </span>
+   </div>  
+   <span class="number_part blink-soft" style="font-family:Oswald, sans-serif;">{{ multiplier }}X</span>
+  </span>
+
+  {%endif%}
+
+
+
+  
+  {%comment%} <span class="bonusentries_promo">
+    {%if holidaybonus_entries != blank %} (Includes {{holidaybonus_entries}} Bonus Entries )
+    {%elsif lastchance_entries != blank %} (Includes {{lastchance_entries}} Bonus Entries) 
+    {%elsif bundlebonus_entries != blank %} (Includes {{bundlebonus_entries}} Bonus Entries) 
+    {%elsif bonus_entries != blank %} (Includes {{bonus_entries}} Bonus Entries) 
+    {%endif%}
+  </span>{%endcomment%} 
+
+</div>
+
+
+<style>
+
+  .product__price-container {
+    width:20%;
+  }
+  .product_entries_discount{
+    font-size: calc(var(--fontsize-text, var(--product-price-font-size)) - 5px);
+    padding: 5px 10px 4px;
+    background-color: var(--product-sale-price-color);
+    border-radius: 5px;
+    line-height: 1;
+    align-self: start;
+    margin-left: 0px;
+    color:#FFF;
+    /*background: #f1f1f1;
+    padding: 1px 10px;*/
+  }
+  .product-block.product-block--price {
+    display:flex;
+  }
+  .product_entries_block {
+    justify-content:center;
+    align-items:center;
+    align-content:flex-start;
+    display:flex;
+    gap:10px;
+  }
+ .vs_product_entries {
+    font-size: calc(var(--typeBaseSize) + 4px);
+    border-left: 1px solid #ccc;
+    padding-left: 20px;
+    margin-left: 14px;
+  }
+  span.bonusentries_promo {
+  }
+  .vs_product_entries .fa-ticket {
+    color: #119211;
+    margin-right: 0.5em;
+  }
+  .product__price-container i {
+    color: #119211;
+    margin-right: 0.5em;
+  }
+  .productView-moreItem{
+    display:flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+
+@media(max-width:480px) {
+  .product__price-container {
+    width:50%;
+  }
+  .vs_product_entries {
+    border-left: 0px solid #ccc;
+    padding-left: 0px;
+    margin-left: 0px;
+    font-size:18px;
+  }
+  .product-block.product-block--price {
+    flex-wrap:wrap;
+  }
+  .product_entries_block {
+    width:100%;
+    align-content: flex-start;
+    justify-content: flex-start;
+  }
+  .productView-moreItem{
+    display:flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+}
+
+
+  .product_entries_part {
+    display: flex;
+    width: max-content;
+}
+  .product_entries_part .icon_content_area {
+    background: rgb(238 238 238 / 80%);
+    padding: 0px 10px;
+}
+  .product_entries_part .entries_count {
+    font-family: oswald, sans-serif;
+    font-weight: 600;
+}
+  .product_entries_part .number_part {
+    background: #1dfe00;
+    padding: 0px 12px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+    animation-name: blinker;
+}
+  @keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+</style>
+{% endif %}

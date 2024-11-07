@@ -1,0 +1,79 @@
+/*add to theme.liquid at bottom {% render 'back-to-the-top' %}*/
+
+
+<a id="BackToTop" href="#" title="Back to the top" class="back-to-top hide">
+  <span>Back to top</span> <i class="fa fa-arrow-circle-up fa-2x"></i>
+</a>
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<style>
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  text-decoration: none;
+  color: #000;
+  background-color: #FFF;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out; /* Fade-in transition */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.back-to-top i {
+  margin-right: 10px;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out, margin 0.4s ease-in-out; /* Add transition for opacity and margin */
+}
+
+.back-to-top:hover {
+  background-color: #FFF;
+}
+
+.back-to-top.show {
+  opacity: 1;
+}
+
+.back-to-top.show i {
+  opacity: 1;
+  margin-right: 8px;
+}
+
+</style>
+<script>
+(function() {
+  function trackScroll() {
+    var scrolled = window.pageYOffset;
+    var coords = 300; // Adjust this value as needed
+
+    var goTopBtn = document.querySelector('.back-to-top');
+
+    if (scrolled > coords) {
+      goTopBtn.classList.add('show');
+      goTopBtn.querySelector('i').style.opacity = 1;
+    } else {
+      goTopBtn.classList.remove('show');
+      goTopBtn.querySelector('i').style.opacity = 0;
+    }
+  }
+
+  function backToTop() {
+    if (window.pageYOffset > 0) {
+      window.scrollBy(0, -80);
+      setTimeout(backToTop, 0);
+    }
+  }
+
+  var goTopBtn = document.querySelector('.back-to-top');
+
+  window.addEventListener('scroll', trackScroll);
+  goTopBtn.addEventListener('click', backToTop);
+})();
+
+</script>

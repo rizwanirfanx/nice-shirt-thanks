@@ -1,0 +1,58 @@
+<!-- Liquid code to fetch phrases -->
+{% assign phrases = "Phrase 1|Phrase 2|Phrase 3|Phrase 4" | split: "|" %}
+
+<!-- CSS styles -->
+<style>
+  /* Define styles for the dynamicPhrase h2 */
+  #dynamicPhrase {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+    text-transform: uppercase;
+    opacity: 0; /* Initially hide the text */
+    transition: opacity 0.5s ease-in-out; /* Define transition effect for opacity */
+  }
+
+  /* Define a class to control the fade-in effect */
+  .fade-in {
+    opacity: 1; /* Set opacity to 1 for fade-in effect */
+  }
+</style>
+
+<!-- JavaScript code -->
+<script>
+  // Get the phrases array from Liquid
+  const phrases = {{ phrases | json }};
+  let currentPhraseIndex = 0;
+  
+  // Function to update the displayed phrase with a fade-in effect
+  function updatePhraseWithFadeIn() {
+    const dynamicPhrase = document.getElementById('dynamicPhrase');
+
+    // Set the initial text before applying the fade-in effect
+    dynamicPhrase.textContent = phrases[currentPhraseIndex];
+    
+    // Apply fade-in effect after a short delay
+    setTimeout(() => {
+      dynamicPhrase.classList.add('fade-in');
+    }, 100);
+  }
+
+  // Function to handle scroll event
+  function handleScroll() {
+    if (window.scrollY > 50) { // Change text when scrolled away (adjust threshold as needed)
+      updatePhraseWithFadeIn(); // Change text with fade-in effect
+      currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+    }
+  }
+
+  // Event listener for scroll
+  window.addEventListener('scroll', handleScroll);
+  
+  // Initially set the first phrase when the page loads
+  updatePhraseWithFadeIn();
+</script>
+
+<!-- HTML for dynamic content -->
+<h2 id="dynamicPhrase"></h2>
