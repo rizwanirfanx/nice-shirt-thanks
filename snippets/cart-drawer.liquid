@@ -161,7 +161,7 @@
                             </div>
                           {%- endif -%}
 
-                          {% render 'product-entries', template: 'cart', product: item.product, current_variant: item.variant, cart_item: item,  cart_item_id: item.index | plus: 1 %}
+                          {% render 'product-entries', template: 'cart', product: item.product, current_variant: item.variant, cart_item: item, cart_item_id: item.index, plus: 1 %}
 
                           {%- if item.product.has_only_default_variant == false
                             or item.properties.size != 0
@@ -554,3 +554,15 @@
     });
   });
 </script>
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% render 'product-entries', template: 'cart', product: item.product, current_variant:
+    item.variant, cart_item: item,  cart_item_id: item.index | plus: 1 %}"
+  to: "{% render 'product-entries', template: 'cart', product: item.product, current_variant:
+    item.variant, cart_item: item, cart_item_id: item.index, plus: 1 %}"
+  position: 7201..7355
+{% endcomment %}
